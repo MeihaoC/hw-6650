@@ -1,0 +1,369 @@
+(base) chengmeihao@chengmeihaodeMacBook-Pro hw2 % aws configure
+AWS Access Key ID [None]: ASIA6GBMEZYVBMXAKECY
+AWS Secret Access Key [None]: idzcQba5FOPD6De9mTKATXLzpaKr7/9Du5rVIpxo
+Default region name [None]: us-west-2 
+Default output format [None]: 
+(base) chengmeihao@chengmeihaodeMacBook-Pro hw2 % aws configure set aws_session_token IQoJb3JpZ2luX2VjEMD//////////wEaCXVzLXdlc3QtMiJHMEUCIQCYVRm41FXpq0cFSNXy5y2fLRSaRxpdVH3Lf8untN7hDgIgBza5XZbAG1ts82lIwKxrV3+ZZWBGh5XwHnS4/9NE6NkqswIIORAAGgw5NzUwNTAxNjU4MDIiDH3iXxLnLJYqnwzNnCqQAt9LaAqpPrlqDGISfNwXnq2Q+I+TZ187aeJr0BDIu+A2FaEIovLiK0x38hF0U+eSvumBuRv+TNtJb4bJixcQj0xN/hVATXwjAFdjLVNDwC7HTMWHi7x+UeTF3MWqbG8ZognguwqVrSzs1GF8AEofNvS5XGzhZ4VkKfRtSmYkwIm7c2qjllrK2grhVUHowLldGbd72lmNLN8OSAFn7woQodmfUB6foo1jvozDDPr+DUhJtpB/0zWWQl5k8DiDhrkvwVVKp0IfwNa6NcNfcUvDEmIDSksG2fmrqtchhtId6aNGIwK5dHDGfKwVJTTBEyQIol8YYYK8jiDJHQTDvzD4iahIm3ei8gAWl6dqfm8SAZt8MK3YksYGOp0B33odITXdu8GVj4fk6/4XGwPH4FGXcaWc8kTujqvolsGlbWfYd06UgfLYr8MoX09+HdlJ78FWK6j0H6rZTm0L56ir/GpI46N6TAjQDKwsUC4oMu4/GNN5tZ8M5cvrmeAk7u6uwzKrwYF490+dOgc0x715RIfO+vvFTUa4S3S3iMeGsmX7UQvIdmr/qEHIM6lFnlxrTtlXHjDALk1XRA==
+(base) chengmeihao@chengmeihaodeMacBook-Pro hw2 % aws sts get-caller-identity
+{
+    "UserId": "AROA6GBMEZYVGYLVS4TVJ:user3750795=cheng.me@northeastern.edu",
+    "Account": "975050165802",
+    "Arn": "arn:aws:sts::975050165802:assumed-role/voclabs/user3750795=cheng.me@northeastern.edu"
+}
+(base) chengmeihao@chengmeihaodeMacBook-Pro hw2 % terraform init
+Initializing the backend...
+Initializing provider plugins...
+- Finding latest version of hashicorp/aws...
+- Installing hashicorp/aws v6.13.0...
+- Installed hashicorp/aws v6.13.0 (signed by HashiCorp)
+Terraform has created a lock file .terraform.lock.hcl to record the provider
+selections it made above. Include this file in your version control repository
+so that Terraform can guarantee to make the same selections by default when
+you run "terraform init" in the future.
+
+Terraform has been successfully initialized!
+
+You may now begin working with Terraform. Try running "terraform plan" to see
+any changes that are required for your infrastructure. All Terraform commands
+should now work.
+
+If you ever set or change modules or backend configuration for Terraform,
+rerun this command to reinitialize your working directory. If you forget, other
+commands will detect it and remind you to do so if necessary.
+(base) chengmeihao@chengmeihaodeMacBook-Pro hw2 % terraform apply -auto-approve
+data.aws_ami.al2023: Reading...
+data.aws_ami.al2023: Read complete after 0s [id=ami-0e7daf2e07a5dd944]
+
+Terraform used the selected providers to generate the following execution plan. Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # aws_instance.demo-instance will be created
+  + resource "aws_instance" "demo-instance" {
+      + ami                                  = "ami-0e7daf2e07a5dd944"
+      + arn                                  = (known after apply)
+      + associate_public_ip_address          = (known after apply)
+      + availability_zone                    = (known after apply)
+      + disable_api_stop                     = (known after apply)
+      + disable_api_termination              = (known after apply)
+      + ebs_optimized                        = (known after apply)
+      + enable_primary_ipv6                  = (known after apply)
+      + force_destroy                        = false
+      + get_password_data                    = false
+      + host_id                              = (known after apply)
+      + host_resource_group_arn              = (known after apply)
+      + iam_instance_profile                 = "LabInstanceProfile"
+      + id                                   = (known after apply)
+      + instance_initiated_shutdown_behavior = (known after apply)
+      + instance_lifecycle                   = (known after apply)
+      + instance_state                       = (known after apply)
+      + instance_type                        = "t2.micro"
+      + ipv6_address_count                   = (known after apply)
+      + ipv6_addresses                       = (known after apply)
+      + key_name                             = "keypair6650"
+      + monitoring                           = (known after apply)
+      + outpost_arn                          = (known after apply)
+      + password_data                        = (known after apply)
+      + placement_group                      = (known after apply)
+      + placement_group_id                   = (known after apply)
+      + placement_partition_number           = (known after apply)
+      + primary_network_interface_id         = (known after apply)
+      + private_dns                          = (known after apply)
+      + private_ip                           = (known after apply)
+      + public_dns                           = (known after apply)
+      + public_ip                            = (known after apply)
+      + region                               = "us-west-2"
+      + secondary_private_ips                = (known after apply)
+      + security_groups                      = (known after apply)
+      + source_dest_check                    = true
+      + spot_instance_request_id             = (known after apply)
+      + subnet_id                            = (known after apply)
+      + tags                                 = {
+          + "Name" = "terraform-created-instance-:)"
+        }
+      + tags_all                             = {
+          + "Name" = "terraform-created-instance-:)"
+        }
+      + tenancy                              = (known after apply)
+      + user_data_base64                     = (known after apply)
+      + user_data_replace_on_change          = false
+      + vpc_security_group_ids               = (known after apply)
+
+      + capacity_reservation_specification (known after apply)
+
+      + cpu_options (known after apply)
+
+      + ebs_block_device (known after apply)
+
+      + enclave_options (known after apply)
+
+      + ephemeral_block_device (known after apply)
+
+      + instance_market_options (known after apply)
+
+      + maintenance_options (known after apply)
+
+      + metadata_options (known after apply)
+
+      + network_interface (known after apply)
+
+      + primary_network_interface (known after apply)
+
+      + private_dns_name_options (known after apply)
+
+      + root_block_device (known after apply)
+    }
+
+  # aws_security_group.ssh will be created
+  + resource "aws_security_group" "ssh" {
+      + arn                    = (known after apply)
+      + description            = "SSH from a single IP"
+      + egress                 = [
+          + {
+              + cidr_blocks      = [
+                  + "0.0.0.0/0",
+                ]
+              + from_port        = 0
+              + ipv6_cidr_blocks = []
+              + prefix_list_ids  = []
+              + protocol         = "-1"
+              + security_groups  = []
+              + self             = false
+              + to_port          = 0
+                # (1 unchanged attribute hidden)
+            },
+        ]
+      + id                     = (known after apply)
+      + ingress                = [
+          + {
+              + cidr_blocks      = [
+                  + "174.6.84.25/32",
+                ]
+              + description      = "SSH"
+              + from_port        = 22
+              + ipv6_cidr_blocks = []
+              + prefix_list_ids  = []
+              + protocol         = "tcp"
+              + security_groups  = []
+              + self             = false
+              + to_port          = 22
+            },
+        ]
+      + name                   = "allow_ssh_from_me"
+      + name_prefix            = (known after apply)
+      + owner_id               = (known after apply)
+      + region                 = "us-west-2"
+      + revoke_rules_on_delete = false
+      + tags_all               = (known after apply)
+      + vpc_id                 = (known after apply)
+    }
+
+Plan: 2 to add, 0 to change, 0 to destroy.
+
+Changes to Outputs:
+  + ec2_public_dns = (known after apply)
+aws_security_group.ssh: Creating...
+aws_security_group.ssh: Creation complete after 3s [id=sg-0cb9ecc92aacc7d3c]
+aws_instance.demo-instance: Creating...
+aws_instance.demo-instance: Still creating... [00m10s elapsed]
+aws_instance.demo-instance: Creation complete after 16s [id=i-0768c4b87902391f4]
+
+Apply complete! Resources: 2 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+ec2_public_dns = "ec2-35-95-145-222.us-west-2.compute.amazonaws.com"
+(base) chengmeihao@chengmeihaodeMacBook-Pro hw2 % ssh -i ~/keypair6650.pem ec2-user@ec2-35-95-145-222.us-west-2.compute.amazonaws.com 
+The authenticity of host 'ec2-35-95-145-222.us-west-2.compute.amazonaws.com (35.95.145.222)' can't be established.
+ED25519 key fingerprint is SHA256:JQN9m8UIbrYYJt2XQ7AtUa55QpBKJtPSHaMQ8Gg5X70.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added 'ec2-35-95-145-222.us-west-2.compute.amazonaws.com' (ED25519) to the list of known hosts.
+   ,     #_
+   ~\_  ####_
+  ~~  \_#####\
+  ~~     \###|
+  ~~       \#/ ___   Amazon Linux 2023 (ECS Optimized)
+   ~~       V~' '->
+    ~~~         /
+      ~~._.   _/
+         _/ _/
+       _/m/'
+
+For documentation, visit http://aws.amazon.com/documentation/ecs
+[ec2-user@ip-172-31-34-250 ~]$ exit
+logout
+Connection to ec2-35-95-145-222.us-west-2.compute.amazonaws.com closed.
+(base) chengmeihao@chengmeihaodeMacBook-Pro hw2 % terraform destroy -auto-approve
+data.aws_ami.al2023: Reading...
+aws_security_group.ssh: Refreshing state... [id=sg-0cb9ecc92aacc7d3c]
+data.aws_ami.al2023: Read complete after 0s [id=ami-0e7daf2e07a5dd944]
+aws_instance.demo-instance: Refreshing state... [id=i-0768c4b87902391f4]
+
+Terraform used the selected providers to generate the following execution plan. Resource actions are indicated with the following symbols:
+  - destroy
+
+Terraform will perform the following actions:
+
+  # aws_instance.demo-instance will be destroyed
+  - resource "aws_instance" "demo-instance" {
+      - ami                                  = "ami-0e7daf2e07a5dd944" -> null
+      - arn                                  = "arn:aws:ec2:us-west-2:975050165802:instance/i-0768c4b87902391f4" -> null
+      - associate_public_ip_address          = true -> null
+      - availability_zone                    = "us-west-2b" -> null
+      - disable_api_stop                     = false -> null
+      - disable_api_termination              = false -> null
+      - ebs_optimized                        = false -> null
+      - force_destroy                        = false -> null
+      - get_password_data                    = false -> null
+      - hibernation                          = false -> null
+      - iam_instance_profile                 = "LabInstanceProfile" -> null
+      - id                                   = "i-0768c4b87902391f4" -> null
+      - instance_initiated_shutdown_behavior = "stop" -> null
+      - instance_state                       = "running" -> null
+      - instance_type                        = "t2.micro" -> null
+      - ipv6_address_count                   = 0 -> null
+      - ipv6_addresses                       = [] -> null
+      - key_name                             = "keypair6650" -> null
+      - monitoring                           = false -> null
+      - placement_partition_number           = 0 -> null
+      - primary_network_interface_id         = "eni-01afbd4c25266aa99" -> null
+      - private_dns                          = "ip-172-31-34-250.us-west-2.compute.internal" -> null
+      - private_ip                           = "172.31.34.250" -> null
+      - public_dns                           = "ec2-35-95-145-222.us-west-2.compute.amazonaws.com" -> null
+      - public_ip                            = "35.95.145.222" -> null
+      - region                               = "us-west-2" -> null
+      - secondary_private_ips                = [] -> null
+      - security_groups                      = [
+          - "allow_ssh_from_me",
+        ] -> null
+      - source_dest_check                    = true -> null
+      - subnet_id                            = "subnet-0c8d000afa884647c" -> null
+      - tags                                 = {
+          - "Name" = "terraform-created-instance-:)"
+        } -> null
+      - tags_all                             = {
+          - "Name" = "terraform-created-instance-:)"
+        } -> null
+      - tenancy                              = "default" -> null
+      - user_data_replace_on_change          = false -> null
+      - vpc_security_group_ids               = [
+          - "sg-0cb9ecc92aacc7d3c",
+        ] -> null
+        # (7 unchanged attributes hidden)
+
+      - capacity_reservation_specification {
+          - capacity_reservation_preference = "open" -> null
+        }
+
+      - cpu_options {
+          - core_count       = 1 -> null
+          - threads_per_core = 1 -> null
+            # (1 unchanged attribute hidden)
+        }
+
+      - credit_specification {
+          - cpu_credits = "standard" -> null
+        }
+
+      - enclave_options {
+          - enabled = false -> null
+        }
+
+      - maintenance_options {
+          - auto_recovery = "default" -> null
+        }
+
+      - metadata_options {
+          - http_endpoint               = "enabled" -> null
+          - http_protocol_ipv6          = "disabled" -> null
+          - http_put_response_hop_limit = 2 -> null
+          - http_tokens                 = "required" -> null
+          - instance_metadata_tags      = "disabled" -> null
+        }
+
+      - primary_network_interface {
+          - delete_on_termination = true -> null
+          - network_interface_id  = "eni-01afbd4c25266aa99" -> null
+        }
+
+      - private_dns_name_options {
+          - enable_resource_name_dns_a_record    = false -> null
+          - enable_resource_name_dns_aaaa_record = false -> null
+          - hostname_type                        = "ip-name" -> null
+        }
+
+      - root_block_device {
+          - delete_on_termination = true -> null
+          - device_name           = "/dev/xvda" -> null
+          - encrypted             = false -> null
+          - iops                  = 3000 -> null
+          - tags                  = {} -> null
+          - tags_all              = {} -> null
+          - throughput            = 125 -> null
+          - volume_id             = "vol-016276dc4d65b00c3" -> null
+          - volume_size           = 30 -> null
+          - volume_type           = "gp3" -> null
+            # (1 unchanged attribute hidden)
+        }
+    }
+
+  # aws_security_group.ssh will be destroyed
+  - resource "aws_security_group" "ssh" {
+      - arn                    = "arn:aws:ec2:us-west-2:975050165802:security-group/sg-0cb9ecc92aacc7d3c" -> null
+      - description            = "SSH from a single IP" -> null
+      - egress                 = [
+          - {
+              - cidr_blocks      = [
+                  - "0.0.0.0/0",
+                ]
+              - from_port        = 0
+              - ipv6_cidr_blocks = []
+              - prefix_list_ids  = []
+              - protocol         = "-1"
+              - security_groups  = []
+              - self             = false
+              - to_port          = 0
+                # (1 unchanged attribute hidden)
+            },
+        ] -> null
+      - id                     = "sg-0cb9ecc92aacc7d3c" -> null
+      - ingress                = [
+          - {
+              - cidr_blocks      = [
+                  - "174.6.84.25/32",
+                ]
+              - description      = "SSH"
+              - from_port        = 22
+              - ipv6_cidr_blocks = []
+              - prefix_list_ids  = []
+              - protocol         = "tcp"
+              - security_groups  = []
+              - self             = false
+              - to_port          = 22
+            },
+        ] -> null
+      - name                   = "allow_ssh_from_me" -> null
+      - owner_id               = "975050165802" -> null
+      - region                 = "us-west-2" -> null
+      - revoke_rules_on_delete = false -> null
+      - tags                   = {} -> null
+      - tags_all               = {} -> null
+      - vpc_id                 = "vpc-0f40be7a8e33bf9fb" -> null
+        # (1 unchanged attribute hidden)
+    }
+
+Plan: 0 to add, 0 to change, 2 to destroy.
+
+Changes to Outputs:
+  - ec2_public_dns = "ec2-35-95-145-222.us-west-2.compute.amazonaws.com" -> null
+aws_instance.demo-instance: Destroying... [id=i-0768c4b87902391f4]
+aws_instance.demo-instance: Still destroying... [id=i-0768c4b87902391f4, 00m10s elapsed]
+aws_instance.demo-instance: Still destroying... [id=i-0768c4b87902391f4, 00m20s elapsed]
+aws_instance.demo-instance: Destruction complete after 29s
+aws_security_group.ssh: Destroying... [id=sg-0cb9ecc92aacc7d3c]
+aws_security_group.ssh: Destruction complete after 0s
+
+Destroy complete! Resources: 2 destroyed.
+(base) chengmeihao@chengmeihaodeMacBook-Pro hw2 % 

@@ -1,8 +1,29 @@
-# Binaries
-myserver
-main
+# Terraform files
+*.tfstate
+*.tfstate.*
+*.tfplan
+.terraform/
+.terraform.lock.hcl
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
 
-# Go specific
+# Terraform variables with sensitive data
+terraform.tfvars
+*.auto.tfvars
+
+# AWS credentials
+.aws/
+aws_credentials
+*.pem
+*.key
+
+# Go build files
 *.exe
 *.exe~
 *.dll
@@ -10,15 +31,37 @@ main
 *.dylib
 *.test
 *.out
+vendor/
 go.work
 
-# IDE files
-.vscode/
-.idea/
+# Docker files
+.dockerignore
 
-# OS files
+# IDE and editor files
+.idea/
+*.swp
+*.swo
+*~
+.vscode/
+*.sublime-*
 .DS_Store
 Thumbs.db
 
-# AWS keys (important!)
-*.pem
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+env/
+venv/
+.env
+
+# Log files
+*.log
+
+# Temporary files
+*.tmp
+*.bak
+*.backup
+tmp/
+temp/
