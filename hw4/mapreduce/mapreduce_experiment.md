@@ -14,16 +14,16 @@ Everything runs on AWS using Docker containers and stores files in S3.
 ## Performance Analysis
 
 ### Speed Improvement:
-- **Sequential Pipline**: 0.88 seconds
-- **Parallel Pipeline**: 0.62 seconds  
-- **Speed boost**: 1.42x faster (42% improvement)
-- **Time saved**: 0.26 seconds
+- **Sequential Pipline**: 0.79 seconds
+- **Parallel Pipeline**: 0.55 seconds  
+- **Speed boost**: 1.43x faster (43% improvement)
+- **Time saved**: 0.24 seconds
 
 The system counted 29,604 total words and found 4,803 different words in the text.
 
 ## Why Only 1.42x Faster with 3 Workers?
 
-I expected 3x faster with 3 workers, but got 1.42x because:
+I expected 3x faster with 3 workers, but got 1.43x because:
 - The splitter and reducer still run one at a time (can't parallelize everything)
 - Time spent uploading/downloading files from S3
 - Network delays between services
