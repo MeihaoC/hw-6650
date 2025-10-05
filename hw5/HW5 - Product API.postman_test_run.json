@@ -1,0 +1,264 @@
+{
+	"id": "1d3cad5f-b7c5-4262-a3bd-c55d676e178d",
+	"name": "HW5 - Product API",
+	"timestamp": "2025-10-05T07:01:30.195Z",
+	"collection_id": "46278282-82218a78-745b-44d3-9cfa-3d2045079714",
+	"folder_id": 0,
+	"environment_id": "46278282-5592a571-d55e-4178-bd36-0dbb4b791ee7",
+	"totalPass": 0,
+	"delay": 0,
+	"persist": true,
+	"status": "finished",
+	"startedAt": "2025-10-05T07:01:28.552Z",
+	"totalFail": 0,
+	"results": [
+		{
+			"id": "f5bc915f-b41a-4b86-913f-c339caf108e7",
+			"name": "Health Check",
+			"url": "http://product-api-alb-1025331415.us-west-2.elb.amazonaws.com/health",
+			"time": 132,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				132
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "fe124813-248a-45cf-b39e-66eaba490ab9",
+			"name": "Add Product Details - Success",
+			"url": "http://product-api-alb-1025331415.us-west-2.elb.amazonaws.com/products/12345/details",
+			"time": 27,
+			"responseCode": {
+				"code": 204,
+				"name": "No Content"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				27
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "e6c1934a-18bd-4626-81a5-1f553a2d7688",
+			"name": "Get Product by ID - Success",
+			"url": "http://product-api-alb-1025331415.us-west-2.elb.amazonaws.com/products/12345",
+			"time": 30,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				30
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "b7bbdb24-3616-4daf-ae5b-0f894b642f1a",
+			"name": "Get Product - Not Found (404)",
+			"url": "http://product-api-alb-1025331415.us-west-2.elb.amazonaws.com/products/99999",
+			"time": 33,
+			"responseCode": {
+				"code": 404,
+				"name": "Not Found"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				33
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "105ab6b1-78d6-4930-ae52-415377f52d96",
+			"name": "Invalid Product ID - Negative (400)",
+			"url": "http://product-api-alb-1025331415.us-west-2.elb.amazonaws.com/products/-1",
+			"time": 53,
+			"responseCode": {
+				"code": 400,
+				"name": "Bad Request"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				53
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "55be39d4-770c-4b91-97d6-9c018a612e31",
+			"name": "Invalid Product ID - Zero (400)",
+			"url": "http://product-api-alb-1025331415.us-west-2.elb.amazonaws.com/products/0",
+			"time": 35,
+			"responseCode": {
+				"code": 400,
+				"name": "Bad Request"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				35
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "34f72269-b29f-488d-9441-7c4eeed9532d",
+			"name": "Invalid Product ID - Non-numeric (400)",
+			"url": "http://product-api-alb-1025331415.us-west-2.elb.amazonaws.com/products/abc",
+			"time": 33,
+			"responseCode": {
+				"code": 400,
+				"name": "Bad Request"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				33
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "5714e2ad-df23-459b-aad3-58c5bc80e2d7",
+			"name": "Missing Required Fields (400)",
+			"url": "http://product-api-alb-1025331415.us-west-2.elb.amazonaws.com/products/12346/details",
+			"time": 25,
+			"responseCode": {
+				"code": 400,
+				"name": "Bad Request"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				25
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "3d009a71-992a-4792-8b4c-ab3c6e477cae",
+			"name": "Mismatched Product ID (400)",
+			"url": "http://product-api-alb-1025331415.us-west-2.elb.amazonaws.com/products/100/details",
+			"time": 26,
+			"responseCode": {
+				"code": 400,
+				"name": "Bad Request"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				26
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "52c1033d-6745-46b6-a206-7b1b3e8ea7a7",
+			"name": "Invalid JSON Format (400)",
+			"url": "http://product-api-alb-1025331415.us-west-2.elb.amazonaws.com/products/12347/details",
+			"time": 25,
+			"responseCode": {
+				"code": 400,
+				"name": "Bad Request"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				25
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "bab781cf-d0a9-4e9e-8e85-bdeec3ff65fd",
+			"name": "Add Another Product",
+			"url": "http://product-api-alb-1025331415.us-west-2.elb.amazonaws.com/products/67890/details",
+			"time": 27,
+			"responseCode": {
+				"code": 204,
+				"name": "No Content"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				27
+			],
+			"allTests": [
+				{}
+			]
+		}
+	],
+	"count": 1,
+	"totalTime": 446,
+	"collection": {
+		"requests": [
+			{
+				"id": "f5bc915f-b41a-4b86-913f-c339caf108e7",
+				"method": "GET"
+			},
+			{
+				"id": "fe124813-248a-45cf-b39e-66eaba490ab9",
+				"method": "POST"
+			},
+			{
+				"id": "e6c1934a-18bd-4626-81a5-1f553a2d7688",
+				"method": "GET"
+			},
+			{
+				"id": "b7bbdb24-3616-4daf-ae5b-0f894b642f1a",
+				"method": "GET"
+			},
+			{
+				"id": "105ab6b1-78d6-4930-ae52-415377f52d96",
+				"method": "GET"
+			},
+			{
+				"id": "55be39d4-770c-4b91-97d6-9c018a612e31",
+				"method": "GET"
+			},
+			{
+				"id": "34f72269-b29f-488d-9441-7c4eeed9532d",
+				"method": "GET"
+			},
+			{
+				"id": "5714e2ad-df23-459b-aad3-58c5bc80e2d7",
+				"method": "POST"
+			},
+			{
+				"id": "3d009a71-992a-4792-8b4c-ab3c6e477cae",
+				"method": "POST"
+			},
+			{
+				"id": "52c1033d-6745-46b6-a206-7b1b3e8ea7a7",
+				"method": "POST"
+			},
+			{
+				"id": "bab781cf-d0a9-4e9e-8e85-bdeec3ff65fd",
+				"method": "POST"
+			}
+		]
+	}
+}

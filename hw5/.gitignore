@@ -1,0 +1,83 @@
+# Terraform
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+.terraform/
+.terraform.lock.hcl
+*.tfvars
+.terraformrc
+terraform.rc
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Sensitive data
+*.pem
+*.key
+*.crt
+*.env
+*.env.local
+.env.*
+secrets.yaml
+credentials.json
+aws_credentials
+config.yaml
+
+# Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+go.work
+vendor/
+
+# IDE & Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.iml
+
+# Logs
+*.log
+logs/
+*.log.*
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Docker
+*.tar
+*.tar.gz
+
+# Locust
+locust-*.html
+*.csv
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.bak
+
+# Build artifacts
+dist/
+build/
+bin/
+pkg/
+
+# Coverage
+*.cover
+coverage.html
+
+# Node (if using any Node tools)
+node_modules/
+package-lock.json

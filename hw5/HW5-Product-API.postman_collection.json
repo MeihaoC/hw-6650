@@ -1,0 +1,215 @@
+{
+    "info": {
+      "name": "HW5 - Product API",
+      "description": "Product API for CS6650 HW5 - E-commerce System",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+      {
+        "name": "Health Check",
+        "request": {
+          "method": "GET",
+          "header": [],
+          "url": {
+            "raw": "{{base_url}}/health",
+            "host": ["{{base_url}}"],
+            "path": ["health"]
+          },
+          "description": "Check if the API server is running"
+        },
+        "response": []
+      },
+      {
+        "name": "Add Product Details - Success",
+        "request": {
+          "method": "POST",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"product_id\": 12345,\n  \"sku\": \"ABC-123-XYZ\",\n  \"manufacturer\": \"Acme Corporation\",\n  \"category_id\": 456,\n  \"weight\": 1250,\n  \"some_other_id\": 789\n}"
+          },
+          "url": {
+            "raw": "{{base_url}}/products/12345/details",
+            "host": ["{{base_url}}"],
+            "path": ["products", "12345", "details"]
+          },
+          "description": "Add or update product details. Should return 204 No Content."
+        },
+        "response": []
+      },
+      {
+        "name": "Get Product by ID - Success",
+        "request": {
+          "method": "GET",
+          "header": [],
+          "url": {
+            "raw": "{{base_url}}/products/12345",
+            "host": ["{{base_url}}"],
+            "path": ["products", "12345"]
+          },
+          "description": "Retrieve product by ID. Should return 200 OK with product data."
+        },
+        "response": []
+      },
+      {
+        "name": "Get Product - Not Found (404)",
+        "request": {
+          "method": "GET",
+          "header": [],
+          "url": {
+            "raw": "{{base_url}}/products/99999",
+            "host": ["{{base_url}}"],
+            "path": ["products", "99999"]
+          },
+          "description": "Try to get a non-existent product. Should return 404 Not Found."
+        },
+        "response": []
+      },
+      {
+        "name": "Invalid Product ID - Negative (400)",
+        "request": {
+          "method": "GET",
+          "header": [],
+          "url": {
+            "raw": "{{base_url}}/products/-1",
+            "host": ["{{base_url}}"],
+            "path": ["products", "-1"]
+          },
+          "description": "Test with invalid product ID (negative). Should return 400 Bad Request."
+        },
+        "response": []
+      },
+      {
+        "name": "Invalid Product ID - Zero (400)",
+        "request": {
+          "method": "GET",
+          "header": [],
+          "url": {
+            "raw": "{{base_url}}/products/0",
+            "host": ["{{base_url}}"],
+            "path": ["products", "0"]
+          },
+          "description": "Test with invalid product ID (zero). Should return 400 Bad Request."
+        },
+        "response": []
+      },
+      {
+        "name": "Invalid Product ID - Non-numeric (400)",
+        "request": {
+          "method": "GET",
+          "header": [],
+          "url": {
+            "raw": "{{base_url}}/products/abc",
+            "host": ["{{base_url}}"],
+            "path": ["products", "abc"]
+          },
+          "description": "Test with invalid product ID (non-numeric). Should return 400 Bad Request."
+        },
+        "response": []
+      },
+      {
+        "name": "Missing Required Fields (400)",
+        "request": {
+          "method": "POST",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"product_id\": 12346,\n  \"sku\": \"TEST-SKU\"\n}"
+          },
+          "url": {
+            "raw": "{{base_url}}/products/12346/details",
+            "host": ["{{base_url}}"],
+            "path": ["products", "12346", "details"]
+          },
+          "description": "Test with missing required fields. Should return 400 Bad Request."
+        },
+        "response": []
+      },
+      {
+        "name": "Mismatched Product ID (400)",
+        "request": {
+          "method": "POST",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"product_id\": 200,\n  \"sku\": \"ABC-123\",\n  \"manufacturer\": \"Test Corp\",\n  \"category_id\": 1,\n  \"weight\": 100,\n  \"some_other_id\": 1\n}"
+          },
+          "url": {
+            "raw": "{{base_url}}/products/100/details",
+            "host": ["{{base_url}}"],
+            "path": ["products", "100", "details"]
+          },
+          "description": "Test with mismatched product IDs. Should return 400 Bad Request."
+        },
+        "response": []
+      },
+      {
+        "name": "Invalid JSON Format (400)",
+        "request": {
+          "method": "POST",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "invalid json"
+          },
+          "url": {
+            "raw": "{{base_url}}/products/12347/details",
+            "host": ["{{base_url}}"],
+            "path": ["products", "12347", "details"]
+          },
+          "description": "Test with invalid JSON. Should return 400 Bad Request."
+        },
+        "response": []
+      },
+      {
+        "name": "Add Another Product",
+        "request": {
+          "method": "POST",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"product_id\": 67890,\n  \"sku\": \"XYZ-789-ABC\",\n  \"manufacturer\": \"Tech Industries\",\n  \"category_id\": 123,\n  \"weight\": 500,\n  \"some_other_id\": 456\n}"
+          },
+          "url": {
+            "raw": "{{base_url}}/products/67890/details",
+            "host": ["{{base_url}}"],
+            "path": ["products", "67890", "details"]
+          },
+          "description": "Add a second product for testing"
+        },
+        "response": []
+      }
+    ],
+    "variable": [
+      {
+        "key": "base_url",
+        "value": "http://localhost:8080",
+        "type": "string"
+      }
+    ]
+  }
