@@ -10,7 +10,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// Product represents a product in our store (matches OpenAPI schema)
+// Product represents a product in the store
 type Product struct {
 	ProductID    int32  `json:"product_id"`
 	SKU          string `json:"sku"`
@@ -20,14 +20,14 @@ type Product struct {
 	SomeOtherID  int32  `json:"some_other_id"`
 }
 
-// Error represents an error response (matches OpenAPI schema)
+// Error represents an error response
 type ErrorResponse struct {
 	Error   string `json:"error"`
 	Message string `json:"message"`
 	Details string `json:"details,omitempty"`
 }
 
-// ProductStore holds our in-memory product data
+// ProductStore holds the in-memory product data
 type ProductStore struct {
 	mu       sync.RWMutex
 	products map[int32]Product
@@ -40,8 +40,8 @@ var store = &ProductStore{
 
 // GetProduct handles GET /products/{productId}
 func GetProduct(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	productIDStr := vars["productId"]
+	vars := mux.Vars(r)               // Extracts URL path parameters
+	productIDStr := vars["productId"] // URL /products/12345 → vars["productId"] = "12345"
 
 	// Parse and validate productId
 	productID64, err := strconv.ParseInt(productIDStr, 10, 32)
@@ -52,7 +52,7 @@ func GetProduct(w http.ResponseWriter, r *http.Request) {
 	productID := int32(productID64)
 
 	// Retrieve product from store
-	store.mu.RLock()
+	store.mu.RLock() // Multiple GET requests can read simultaneously
 	product, exists := store.products[productID]
 	store.mu.RUnlock()
 
@@ -101,8 +101,6 @@ func AddProductDetails(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Store the product (upsert behavior: add or update)
-	// Note: Strictly following the spec would require checking if product exists first
-	// and returning 404 if not found. For this assignment, we allow creation.
 	store.mu.Lock()
 	store.products[productID] = product
 	store.mu.Unlock()
