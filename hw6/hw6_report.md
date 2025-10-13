@@ -182,7 +182,7 @@ Deploy the same product search service with horizontal scaling and auto scaling 
 
 ![Locust results for 30 users](screenshots/Screenshot%202025-10-12%20at%209.40.15 PM.png)
 ![Locust results for 30 users](screenshots/number_of_users_1760330199.251-1.png)
-![CloudWatch metrics showing CPU and task count](screenshots/number_of_users_1760330199.251-1.png)
+![CloudWatch metrics showing CPU and task count](screenshots/Screenshot%202025-10-12%20at%204.41.23 PM.png)
 
 **Key Observations:**
 - Total Requests: 147,304
