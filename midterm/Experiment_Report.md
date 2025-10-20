@@ -108,7 +108,7 @@ When the second task stopped, capacity dropped to 33% (below 66% threshold), tri
 - **Downtime:** 0 seconds
 
 **Analysis:**
-The system continuously self-healed as tasks were destroyed. By the time the 3rd original task was stopped, 2 replacement tasks were already running and healthy. The system completed full fleet replacement without user impact, demonstrating resilience against cascading failures regardless of timing.
+The system continuously self-healed as tasks were destroyed. By the time the 3rd original task was stopped, 2 replacement tasks were already running and healthy. The system completed full fleet replacement without user impact, demonstrating resilience against cascading failures with sufficient time between failures. The key improvement over the 2-task configuration: the vulnerability window only appears after 2 failures instead of 1, and is significantly shorter (~30 seconds vs 60-90 seconds).
 
 ---
 
@@ -138,22 +138,21 @@ Stopping all tasks in a single action bypassed the minimum healthy threshold pro
 | **Problem: Simultaneous** | 2 tasks, 100% min | 34,402 (7.9%) | 30s | No redundancy buffer |
 | **Problem: Cascading** | 2 tasks, 100% min | 0 (0%) | 0s* | 60-90s vulnerability window |
 | **Solution: Rapid Failure** | 3 tasks, 66% min | 0 (0%) | 0s | Proactive capacity maintenance |
-| **Solution: Rolling Failure** | 3 tasks, 66% min | 0 (0%) | 0s | No vulnerability window |
+| **Solution: Rolling Failure** | 3 tasks, 66% min | 0 (0%) | 0s | 30s vulnerability window |
 | **Solution: Simultaneous** | 3 tasks, 66% min | 33,116 (7.6%) | 35s | Unrealistic edge case |
-
-*Survived due to lucky timing; would have failed if second task stopped within 60-90 seconds
 
 ### Key Findings
 
 The 2-task configuration creates a critical vulnerability: a 60-90 second window after the first failure where system survival depends on timing. Production failures (memory leaks, crashes, resource exhaustion) don't respect timing windows.
 
-The 3-task configuration with 66% minimum healthy threshold eliminates this dependency by:
-- Maintaining minimum 2-task capacity at all times
-- Surviving sequential failures regardless of timing
-- Providing guaranteed redundancy buffer
+The 3-task configuration with 66% minimum healthy threshold significantly reduces vulnerability by:
+- Delaying vulnerability window: Requires 2 failures instead of 1 to enter vulnerable state
+- Shortening vulnerability duration: ~30 seconds instead of 60-90 seconds
+- Surviving sequential failures with reasonable intervals between them
+- Providing guaranteed redundancy buffer (N+1)
 
 **Resilience Pattern Applied:**
-This solution combines over-provisioning (N+1 redundancy) with proactive capacity management. The 66% threshold ensures ECS maintains sufficient capacity during deployments and triggers immediate replacement when failures occur.
+This solution combines over-provisioning (N+1 redundancy) with proactive capacity management. The 66% threshold ensures ECS maintains at least 2 healthy tasks. After the first failure, the system still has 2 tasks running - no immediate vulnerability. Only after a second failure does the system enter a shorter (~30s) vulnerability window while 2 replacement tasks launch.
 
 **Cost-Benefit Analysis:**
 - Additional cost: 1 extra task (~$15/month, 50% increase)
@@ -162,20 +161,34 @@ This solution combines over-provisioning (N+1 redundancy) with proactive capacit
 
 ### Limitations and Future Improvements
 
-While the 3-task solution successfully handles sequential failures, it cannot prevent downtime from simultaneous catastrophic failures. As shown in Test 3, when all 3 tasks stopped simultaneously, the system experienced 35 seconds of downtime, which is the same to the 2-task configuration's outage. This demonstrates that the solution's effectiveness depends on failure patterns:
+The 3-task solution significantly improves resilience but **cannot completely prevent downtime** in all scenarios. As the test results demonstrate:
 
-- **For cascading failures (20-30s intervals):** The 3-task solution eliminates the 60-90 second vulnerability window entirely, as replacement tasks become healthy before subsequent failures occur.
-- **For simultaneous failures:** Both configurations suffer similar downtimes (~35s), as cold start delays cannot be avoided when all capacity is lost at once.
+**Vulnerability Window Comparison:**
+- **2 tasks, 100% min**: Enters 60-90s vulnerability after 1st failure
+- **3 tasks, 66% min**: Enters ~30s vulnerability after 2nd failure
 
-The key improvement is that the 3-task solution handles the more realistic cascading failure scenario without timing dependencies, while the 2-task configuration relies on favorable timing (90+ second intervals) to avoid outages.
+**When the 3-task solution CAN prevent downtime:**
+- Sequential failures with sufficient intervals (>30 seconds apart)
+- Single task failures
+- Rolling deployments and updates
 
-**Additional strategies for achieving true zero-downtime:**
+**When the 3-task solution CANNOT prevent downtime:**
+- **Rapid cascading failures**: If 2 failures occur within 30 seconds AND a 3rd failure occurs during the replacement window → system enters the ~30s vulnerability window with only 1 task. If that final task fails before replacements become healthy, downtime occurs.
+- **Simultaneous catastrophic failures**: Stopping all 3 tasks at once (as shown in Test 3) causes ~35 seconds of downtime - similar to the 2-task configuration. The minimum healthy threshold is bypassed when all capacity is lost simultaneously.
+
+**For simultaneous failures:**
+Both configurations suffer similar downtimes (~35s), as cold start delays cannot be avoided when all capacity is lost at once. The 3-task configuration offers no advantage in this scenario.
+
+**The key improvement:** The 3-task solution **delays when vulnerability begins** (after 2 failures vs 1) and **reduces vulnerability duration** (30s vs 60-90s). This handles realistic cascading failure scenarios much better than the 2-task configuration, which depends on favorable timing after just a single failure. However, it does not guarantee zero downtime - it **significantly reduces the probability** of downtime by requiring more failures in a shorter timeframe.
+
+**Additional strategies for further reducing vulnerability and achieving true zero-downtime:**
 - **Multi-AZ deployment:** Distribute tasks across multiple availability zones to survive zone-level failures
 - **Pre-warmed standby tasks:** Maintain warm pool of ready tasks to eliminate cold start delays
 - **Blue-green deployment:** Run parallel environments to enable instant failover
 - **Cross-region redundancy:** Deploy in multiple AWS regions for disaster recovery
+- **Higher over-provisioning:** N+2 or N+3 redundancy for even more failure tolerance
 
-These approaches require additional complexity and cost but provide higher availability guarantees for mission-critical applications.
+These approaches require additional complexity and cost but provide higher availability guarantees for mission-critical applications where even brief downtime is unacceptable.
 
 **Production Implications:**
-The solution eliminates downtime for all real-world sequential failure modes at minimal additional cost, providing deterministic resilience rather than relying on favorable failure timing. For most production workloads, this represents an optimal balance between cost, complexity, and reliability.Retry
+The solution **significantly reduces** downtime for real-world sequential failure modes at minimal additional cost. While not preventing all possible downtime scenarios, the N+1 over-provisioning provides **much more resilient, timing-independent behavior** compared to minimal redundancy. The system can tolerate 1 failure safely and handles 2 rapid failures better than the 2-task setup. For most production workloads, this represents an optimal balance between cost, complexity, and reliability.
