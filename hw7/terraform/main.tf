@@ -11,6 +11,25 @@ provider "aws" {
   region = "us-west-2"
 }
 
+# ECR Repositories
+resource "aws_ecr_repository" "order_api" {
+  name                 = "order-api"
+  image_tag_mutability = "MUTABLE"
+  
+  image_scanning_configuration {
+    scan_on_push = false
+  }
+}
+
+resource "aws_ecr_repository" "order_processor" {
+  name                 = "order-processor"
+  image_tag_mutability = "MUTABLE"
+  
+  image_scanning_configuration {
+    scan_on_push = false
+  }
+}
+
 # SNS Topic for order events
 resource "aws_sns_topic" "order_processing_events" {
   name = "order-processing-events"
@@ -79,4 +98,13 @@ output "sqs_queue_url" {
 output "sqs_queue_arn" {
   value = aws_sqs_queue.order_processing_queue.arn
   description = "ARN of the SQS queue"
+}
+
+# Outputs for ECR
+output "ecr_order_api_url" {
+  value = aws_ecr_repository.order_api.repository_url
+}
+
+output "ecr_order_processor_url" {
+  value = aws_ecr_repository.order_processor.repository_url
 }

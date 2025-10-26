@@ -32,3 +32,27 @@ class OrderUser(HttpUser):
                 response.success()
             else:
                 response.failure(f"Got status code {response.status_code}")
+
+    @task
+    def create_async_order(self):
+        """Test async endpoint"""
+        order = {
+            "customer_id": random.randint(1, 1000),
+            "items": [
+                {
+                    "product_id": f"item-{random.randint(1, 100)}",
+                    "quantity": random.randint(1, 5),
+                    "price": round(random.uniform(10.0, 100.0), 2)
+                }
+            ]
+        }
+        
+        with self.client.post(
+            "/orders/async",
+            json=order,
+            catch_response=True
+        ) as response:
+            if response.status_code == 202:
+                response.success()
+            else:
+                response.failure(f"Got status code {response.status_code}")
