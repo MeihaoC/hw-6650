@@ -45,6 +45,7 @@ User 5:  15 seconds
 ...
 User 10: 30 seconds (timeout!) ❌
 User 11+: 30+ seconds (timeout!) ❌
+```
 
 **With 30-second timeout:**
 - **First ~10 orders succeed** (complete within 30s)
