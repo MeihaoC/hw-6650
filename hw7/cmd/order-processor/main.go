@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"strconv"
 	"sync"
 	"syscall"
 	"time"
@@ -14,6 +15,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
+	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
 )
 
 var (
@@ -48,41 +50,71 @@ func simulatePaymentProcessing() {
 	<-done
 }
 
-// Process a single order
-func processOrder(order models.Order, receiptHandle string, wg *sync.WaitGroup) {
-	defer wg.Done()
+// Worker goroutine - processes messages from a channel
+func worker(id int, jobs <-chan types.Message, wg *sync.WaitGroup) {
+	for msg := range jobs {
+		// Parse the SNS message wrapper
+		var snsMessage struct {
+			Message string `json:"Message"`
+		}
 
-	log.Printf("Processing order: %s (customer: %d)", order.OrderID, order.CustomerID)
+		if err := json.Unmarshal([]byte(*msg.Body), &snsMessage); err != nil {
+			log.Printf("Worker %d: Failed to parse SNS wrapper: %v", id, err)
+			wg.Done()
+			continue
+		}
 
-	// Simulate payment processing
-	simulatePaymentProcessing()
+		// Parse the actual order
+		var order models.Order
+		if err := json.Unmarshal([]byte(snsMessage.Message), &order); err != nil {
+			log.Printf("Worker %d: Failed to parse order: %v", id, err)
+			wg.Done()
+			continue
+		}
 
-	log.Printf("Completed order: %s", order.OrderID)
+		log.Printf("Worker %d: Processing order %s (customer: %d)", id, order.OrderID, order.CustomerID)
 
-	// Delete message from queue after successful processing
-	_, err := sqsClient.DeleteMessage(context.TODO(), &sqs.DeleteMessageInput{
-		QueueUrl:      &queueURL,
-		ReceiptHandle: &receiptHandle,
-	})
+		// Simulate payment processing
+		simulatePaymentProcessing()
 
-	if err != nil {
-		log.Printf("Failed to delete message: %v", err)
+		log.Printf("Worker %d: Completed order %s", id, order.OrderID)
+
+		// Delete message from queue after successful processing
+		_, err := sqsClient.DeleteMessage(context.TODO(), &sqs.DeleteMessageInput{
+			QueueUrl:      &queueURL,
+			ReceiptHandle: msg.ReceiptHandle,
+		})
+
+		if err != nil {
+			log.Printf("Worker %d: Failed to delete message: %v", id, err)
+		}
+
+		wg.Done()
 	}
 }
 
-// Poll SQS continuously
+// Poll SQS continuously with worker pool
 func pollQueue(numWorkers int) {
 	log.Printf("Starting order processor with %d worker(s)", numWorkers)
 
+	// Create a buffered channel for jobs
+	jobs := make(chan types.Message, 100)
+
 	var wg sync.WaitGroup
 
+	// Start worker goroutines
+	for w := 1; w <= numWorkers; w++ {
+		go worker(w, jobs, &wg)
+	}
+
+	// Main polling loop
 	for {
 		// Long polling: wait up to 20 seconds for messages
 		result, err := sqsClient.ReceiveMessage(context.TODO(), &sqs.ReceiveMessageInput{
 			QueueUrl:            &queueURL,
-			MaxNumberOfMessages: 10, // Receive up to 10 messages
-			WaitTimeSeconds:     20, // Long polling (20 seconds)
-			VisibilityTimeout:   30, // 30 seconds to process
+			MaxNumberOfMessages: 10,
+			WaitTimeSeconds:     20,
+			VisibilityTimeout:   30,
 		})
 
 		if err != nil {
@@ -98,42 +130,28 @@ func pollQueue(numWorkers int) {
 
 		log.Printf("Received %d messages from queue", len(result.Messages))
 
-		// Process each message in a separate goroutine
+		// Send messages to workers
 		for _, msg := range result.Messages {
-			// Parse the SNS message wrapper
-			var snsMessage struct {
-				Message string `json:"Message"`
-			}
-
-			if err := json.Unmarshal([]byte(*msg.Body), &snsMessage); err != nil {
-				log.Printf("Failed to parse SNS wrapper: %v", err)
-				continue
-			}
-
-			// Parse the actual order
-			var order models.Order
-			if err := json.Unmarshal([]byte(snsMessage.Message), &order); err != nil {
-				log.Printf("Failed to parse order: %v", err)
-				continue
-			}
-
-			// Spawn goroutine to process this order
 			wg.Add(1)
-			go processOrder(order, *msg.ReceiptHandle, &wg)
+			jobs <- msg
 		}
 	}
 }
 
 func main() {
-	// Default to 1 worker (Phase 3 requirement)
+	// Read NUM_WORKERS from environment variable
 	numWorkers := 1
 	if workers := os.Getenv("NUM_WORKERS"); workers != "" {
-		// We'll use this in Phase 5 for scaling
-		log.Printf("NUM_WORKERS set to: %s (not used in this simple version)", workers)
+		if w, err := strconv.Atoi(workers); err == nil && w > 0 {
+			numWorkers = w
+		} else {
+			log.Printf("Invalid NUM_WORKERS value: %s, defaulting to 1", workers)
+		}
 	}
 
 	log.Printf("Order Processor starting...")
 	log.Printf("Queue URL: %s", queueURL)
+	log.Printf("Number of workers: %d", numWorkers)
 
 	// Handle graceful shutdown
 	sigChan := make(chan os.Signal, 1)

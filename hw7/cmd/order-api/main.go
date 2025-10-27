@@ -48,29 +48,33 @@ func simulatePaymentProcessing() {
 }
 
 func handleSyncOrder(w http.ResponseWriter, r *http.Request) {
+	// 1. Check if the method is POST
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
+	// 2. Parse the request body into an order struct
 	var order models.Order
 	if err := json.NewDecoder(r.Body).Decode(&order); err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
-	// Generate order ID and timestamp
-	order.OrderID = uuid.New().String()
-	order.CreatedAt = time.Now()
-	order.Status = "processing"
+	// 3. Generate order ID and timestamp
+	order.OrderID = uuid.New().String() // Generate a unique order ID
+	order.CreatedAt = time.Now()        // Current timestamp
+	order.Status = "processing"         // Initial status
 
 	log.Printf("Processing sync order: %s", order.OrderID)
 
-	// Simulate 3-second payment processing (THE BOTTLENECK!)
+	// 4. Simulate 3-second payment processing (THE BOTTLENECK!)
 	simulatePaymentProcessing()
 
+	// 5. Update the order status to completed
 	order.Status = "completed"
 
+	// 6. Return the order response to customer
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(order)
@@ -94,16 +98,17 @@ func handleAsyncOrder(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("Accepting async order: %s", order.OrderID)
 
-	// Publish to SNS (fast!)
+	// Convert the order struct to JSON
 	orderJSON, err := json.Marshal(order)
 	if err != nil {
 		http.Error(w, "Failed to serialize order", http.StatusInternalServerError)
 		return
 	}
 
+	// Publish to SNS (Fast!)
 	_, err = snsClient.Publish(&sns.PublishInput{
-		TopicArn: aws.String(snsTopicARN),
-		Message:  aws.String(string(orderJSON)),
+		TopicArn: aws.String(snsTopicARN),       // Where to send
+		Message:  aws.String(string(orderJSON)), // What to send
 	})
 
 	if err != nil {
