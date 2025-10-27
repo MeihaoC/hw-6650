@@ -70,7 +70,6 @@ With synchronous processing under load:
 - Queue grows faster than it can drain
 - Later customers timeout waiting
 
-**The only solution: Stop making customers wait in the HTTP connection.**
 ---
 
 ## Phase 3: The Async Solution
