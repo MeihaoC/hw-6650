@@ -66,12 +66,20 @@ Customer → API → SNS → SQS → Response (instant!)
 
 ### Performance Comparison
 
+My results:
 | Metric | Sync | Async | Improvement |
 |--------|------|-------|-------------|
 | Response Time | 3024ms | 40ms | **76x faster** |
+| Throughput | 5.7 RPS | 56.8 RPS | **10x faster** |
 | Success Rate | 100% | 100% | Same |
 | User Experience | Wait 3s | Instant | ✅ Better |
 | Scalability | Limited | Unlimited | ✅ Better |
+
+Junping's results:
+![](screenshots/9da4bd2d-7e4e-4b0f-8aae-093843aefdde.png)
+
+Zhuoyue's results:
+![](screenshots/Screenshot%202025-10-26%20at%2018.14.27.png)
 
 ### Key Benefits
 
