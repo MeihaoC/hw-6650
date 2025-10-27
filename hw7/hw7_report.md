@@ -192,6 +192,12 @@ With async architecture, orders are accepted instantly, but they queue up waitin
 | 20      | 6.67/sec       | 2,579      | 6.4 min    | ❌ No        |
 | 100     | 33.3/sec       | 616        | 18 sec     | ✅ Almost!   |
 
+Junping's results:
+![](screenshots/a9a0d965-f41c-4701-9ac4-af594e0f7a0e.png)
+
+Zhuoyue's results:
+![](screenshots/Screenshot%202025-10-26%20at%2018.12.15.png)
+
 ---
 
 ## Analysis Questions
