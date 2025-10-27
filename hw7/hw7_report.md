@@ -177,7 +177,7 @@ With async architecture, orders are accepted instantly, but they queue up waitin
 
 ### Complete Worker Scaling Results
 
-| Workers | Processing Rate | Peak Queue | Drain Time | Can Keep Up? |
+| Workers | Processing Rate | Peak Queue Depth | Drain Time | Can Keep Up? |
 |---------|-----------------|------------|------------|--------------|
 | 1       | 0.33/sec       | 3,420      | 2.9 hours  | ❌ No        |
 | 5       | 1.67/sec       | 3,277      | 32.7 min   | ❌ No        |
@@ -295,3 +295,106 @@ Successfully implemented and deployed an event-driven async order processing sys
 - ✅ Demonstrates production-ready async architecture patterns
 
 **Key insight:** Async architecture with proper worker scaling enables handling burst traffic while maintaining instant customer response times. The system trades immediate processing for guaranteed order acceptance, dramatically improving customer experience during high-load scenarios.
+
+## Part III: Lambda vs ECS - Serverless Comparison
+
+### The Question
+
+After successfully implementing the async ECS/SQS architecture, we explored whether AWS Lambda could eliminate operational overhead while maintaining the same functionality.
+
+### Architecture Simplification
+
+**Part II (ECS/SQS):**
+```
+Order API → SNS → SQS → ECS Workers
+(Manual: queue monitoring, worker scaling, infrastructure management)
+Cost: $17/month
+```
+
+**Part III (Lambda):**
+```
+Order API → SNS → Lambda
+(AWS manages: scaling, infrastructure, everything)
+Cost: $0/month (within free tier)
+```
+
+---
+
+### Deployment
+
+**Lambda Configuration:**
+- Runtime: Go (provided.al2)
+- Memory: 512 MB
+- Timeout: 10 seconds
+- Trigger: SNS topic (order-processing-events)
+
+**Code:** Simplified handler processes SNS events directly - no polling, no worker pool, no message deletion logic required.
+
+---
+
+### Cold Start Analysis
+
+**Test:** Sent 5 orders through existing Order API, observed Lambda execution in CloudWatch.
+
+**Results:**
+
+| Request | Init Duration | Total Duration | Overhead |
+|---------|---------------|----------------|----------|
+| Order 1 (Cold) | 65.91ms | 3072ms | 2.2% |
+| Orders 2-5 (Warm) | 0ms | ~3004ms | 0% |
+
+**Cold start frequency:** First request and after ~5-10 minutes idle.
+
+**Impact:** 65.91ms overhead on 3-second background processing is negligible. Customer already received instant confirmation (40ms) from async API.
+
+---
+
+### Cost Comparison
+
+**For 10,000 orders/month:**
+
+**ECS:**
+- 2 tasks running 24/7: **$17/month**
+
+**Lambda:**
+- Requests: 10,000 (under 1M free tier) = $0
+- Compute: 15,000 GB-seconds (under 400K free tier) = $0
+- **Total: $0/month**
+
+**Savings:** $17/month (100%)
+
+**Lambda stays FREE until 267K orders/month**
+
+---
+
+### Trade-Off Analysis
+
+**What You Gain:**
+- ✅ Zero operational overhead (no queue monitoring, no scaling decisions)
+- ✅ $204/year cost savings
+- ✅ Automatic scaling to any load
+- ✅ Pay only for actual usage
+
+**What You Lose:**
+- ❌ No persistent message queue (can't inspect backlog)
+- ❌ Limited retry control (SNS retries twice, then discards)
+- ❌ Occasional cold start delays (~68ms, 2% overhead)
+
+---
+
+### Recommendation
+
+**Switch to Lambda for startup phase.** The $204/year savings and zero operational overhead outweigh the trade-offs. SNS's two automatic retries are sufficient for our payment processing, and the 2.2% cold start overhead is negligible for background processing. Lambda eliminates queue monitoring, worker scaling, and infrastructure management, allowing the team to focus on product development.
+
+**Re-evaluate at 267K orders/month when approaching free tier limits.**
+
+---
+
+## Overall Conclusion
+
+Successfully implemented and compared three architectures:
+1. **Synchronous:** Simple but fails under load (3024ms response)
+2. **Async (ECS/SQS):** Scalable and reliable (40ms response, worker scaling)
+3. **Serverless (Lambda):** Simplest operations, lowest cost (40ms response, zero ops)
+
+**Key insight:** For startups, Lambda's operational simplicity and cost savings make it the optimal choice for async order processing until reaching enterprise scale.
