@@ -20,6 +20,9 @@ var (
 	snsTopicARN string
 )
 
+// Simulate external payment processor that can only handle 1 request at a time
+var paymentProcessorLock = make(chan struct{}, 1)
+
 func init() {
 	// Initialize AWS session
 	sess := session.Must(session.NewSession(&aws.Config{
@@ -33,12 +36,21 @@ func init() {
 	if snsTopicARN == "" {
 		log.Println("Warning: SNS_TOPIC_ARN not set, async endpoint will not work")
 	}
+
+	// Initialize payment processor lock (only 1 concurrent payment allowed)
+	paymentProcessorLock <- struct{}{}
 }
 
-// Simulate payment processing bottleneck
+// Simulate payment processing bottleneck - ONLY 1 PAYMENT AT A TIME!
 func simulatePaymentProcessing() {
-	// Create a buffered channel to actually block the goroutine
-	// (time.Sleep doesn't block the thread in Go)
+	// Acquire lock - this blocks if another payment is being processed
+	<-paymentProcessorLock
+	defer func() {
+		// Release lock when done
+		paymentProcessorLock <- struct{}{}
+	}()
+
+	// Simulate 3-second payment API call
 	done := make(chan bool, 1)
 	go func() {
 		time.Sleep(3 * time.Second)
@@ -68,7 +80,8 @@ func handleSyncOrder(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("Processing sync order: %s", order.OrderID)
 
-	// 4. Simulate 3-second payment processing (THE BOTTLENECK!)
+	// 4. THIS NOW BLOCKS if another order is being processed!
+	// Only 1 payment can happen at a time
 	simulatePaymentProcessing()
 
 	// 5. Update the order status to completed

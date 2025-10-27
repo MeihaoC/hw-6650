@@ -25,7 +25,7 @@ class OrderUser(HttpUser):
         with self.client.post(
             "/orders/sync",
             json=order,
-            timeout=5.0, # Customer won't wait for more than 5 seconds
+            timeout=30.0, # Customer won't wait for more than 30 seconds
             catch_response=True
         ) as response:
             if response.status_code == 200:
