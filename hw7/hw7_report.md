@@ -1,4 +1,4 @@
-# HW7 Report: Async Order Processing with AWS ECS
+# HW7 Report
 
 ## Phase 1-2: The Synchronous Bottleneck
 
