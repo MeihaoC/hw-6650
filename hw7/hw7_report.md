@@ -4,38 +4,72 @@
 
 ### The Problem
 
-Our e-commerce platform processes orders with 3-second payment verification. During normal operations (5 orders/second), the system works fine. But when marketing launches a flash sale expecting 60 orders/second, the synchronous architecture fails.
+Our e-commerce platform processes orders with 3-second payment verification. The payment processor can only handle **one payment at a time** due to API rate limits. During normal operations this works, but when marketing launches a flash sale expecting 60 orders/second, the synchronous architecture catastrophically fails.
 
 ### The Math
 
 **Payment processor speed:** 1 order per 3 seconds = **0.33 orders/second**
 
 **With 20 concurrent customers:**
-- Maximum throughput = 20 concurrent requests ÷ 3 seconds = **6.67 orders/second**
+- Orders attempt simultaneously: 20
+- Payment processor handles: 1 at a time
+- Queue builds up: 19 customers waiting
+- Maximum throughput: **0.33 orders/second**
 
 **Flash sale demand:** 60 orders/second
 
-**Orders lost per second:** 60 - 6.67 = **53.33 orders/second lost** ❌
+**Orders lost per second:** 60 - 0.33 = **59.67 orders/second lost** ❌
 
 ### Test Results: Synchronous System
 
 **Locust Load Test (20 users, 60 seconds):**
-- Median response time: **3024ms**
-- Actual throughput: **5.7 orders/second**
-- Result: Customers wait 3 seconds per order
+
+| Metric | Result |
+|--------|--------|
+| **Requests attempted** | 49 |
+| **Requests completed** | 29 |
+| **Failures** | 20 (41% failure rate) |
+| **Median response** | **30,000ms (30 seconds!)** |
+| **Average response** | **25,365ms (25.4 seconds)** |
+| **Throughput** | **0.4 RPS** |
 
 ### What Happens to Customers?
 
-With synchronous processing:
-1. Long wait times (3+ seconds per order)
-2. Browser timeouts for impatient users
-3. Duplicate orders from multiple clicks
-4. Lost sales as customers abandon checkout
+**The cascade failure:**
+```
+User 1:  3 seconds (first in queue) ✅
+User 2:  6 seconds (waits for user 1) ✅
+User 3:  9 seconds (waits for users 1-2) ✅
+User 4:  12 seconds
+User 5:  15 seconds
+...
+User 10: 30 seconds (timeout!) ❌
+User 11+: 30+ seconds (timeout!) ❌
+
+**With 30-second timeout:**
+- **First ~10 orders succeed** (complete within 30s)
+- **Remaining 10+ orders timeout** (waited too long)
+- **41% failure rate** - customers abandon checkout
+- **Those who succeed waited average 25 seconds!**
+
+### Customer Experience
+
+With synchronous processing under load:
+1. **Extremely long wait times** (25+ seconds average)
+2. **High failure rate** (41% of orders failed/timeout)
+3. **Customer abandonment** (users close browser after 30s)
+4. **Lost revenue** (only 59% of orders completed)
+5. **Poor brand reputation** (system appears broken)
 
 ### The Reality
 
-**You cannot make payment processing faster** - it's fixed at 3 seconds. The only solution: **stop making customers wait**.
+**You cannot make payment processing faster** - it's limited to 1 concurrent payment by the external API. With 20 customers trying to check out simultaneously:
+- Only 1 processes at a time
+- Others queue up in HTTP connections
+- Queue grows faster than it can drain
+- Later customers timeout waiting
 
+**The only solution: Stop making customers wait in the HTTP connection.**
 ---
 
 ## Phase 3: The Async Solution
@@ -44,9 +78,9 @@ With synchronous processing:
 
 **Before (Synchronous):**
 ```
-Customer → API → Payment (3s) → Response
+Customer → API → Payment (30s) → Response
          ↓
-    Customer waits 3 seconds ❌
+    Customer waits 30 seconds ❌
 ```
 
 **After (Asynchronous):**
@@ -69,10 +103,10 @@ Customer → API → SNS → SQS → Response (instant!)
 My results:
 | Metric | Sync | Async | Improvement |
 |--------|------|-------|-------------|
-| Response Time | 3024ms | 40ms | **76x faster** |
-| Throughput | 5.7 RPS | 56.8 RPS | **10x faster** |
-| Success Rate | 100% | 100% | Same |
-| User Experience | Wait 3s | Instant | ✅ Better |
+| Response Time | 30,000ms | 40ms | **750x faster** |
+| Throughput | 0.4 RPS | 57 RPS | **142x higher** |
+| Success Rate | 59% | 100% | 41% more orders |
+| Customer Experience | 25s wait + failures | Instant | ✅ Critical |
 | Scalability | Limited | Unlimited | ✅ Better |
 
 Junping's results:
@@ -84,7 +118,7 @@ Zhuoyue's results:
 ### Key Benefits
 
 **Customer experience:**
-- Instant order confirmation (40ms vs 3024ms)
+- Instant order confirmation (40ms vs 30000ms)
 - No waiting for payment processing
 - 100% order acceptance during flash sales
 
@@ -204,7 +238,19 @@ Zhuoyue's results:
 
 ### 1. How many times more orders did async accept compared to sync?
 
-Both approaches accepted the same number of orders (100% success rate), but async was **76x faster** (40ms vs 3024ms response time). The key difference is customer experience: async returns immediately while sync makes customers wait.
+The async approach accepted **dramatically more orders** than sync under the same load:
+
+**Order acceptance:**
+- Sync: 29 completed, 20 failed = **59% success rate**
+- Async: 3,430+ completed, 0-1 failed = **~100% success rate**
+- **Result: Async accepted 118x more orders** (3,430 vs 29)
+
+**Response time:**
+- Sync: 30,000ms median (25,365ms average)
+- Async: 40ms median
+- **Result: Async was 750x faster** (30,000ms vs 40ms)
+
+**The key difference:** Sync makes customers wait in the HTTP connection while orders queue up one-by-one. With 20 concurrent users, only the first ~10 complete before 30-second timeouts occur. Async accepts all orders instantly (40ms) and processes them in the background, achieving 100% acceptance rate.
 
 ### 2. What causes queue buildup and how do you prevent it?
 
