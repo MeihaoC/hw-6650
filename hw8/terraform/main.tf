@@ -26,6 +26,14 @@ module "rds" {
   security_group_id = module.network.security_group_id
 }
 
+# DynamoDB Module - NoSQL database for shopping carts (STEP II)
+# Design: Single table with cart_id as partition key
+# Items embedded in cart document (NoSQL pattern)
+module "dynamodb" {
+  source       = "./modules/dynamodb"
+  service_name = var.service_name
+}
+
 module "ecr" {
   source          = "./modules/ecr"
   repository_name = var.ecr_repository_name
@@ -57,13 +65,19 @@ module "ecs" {
   target_group_arn   = module.alb.target_group_arn  # Added this
   
   # Database connection - passed to ECS tasks as environment variables
+  # MySQL (RDS) - for STEP I
   db_host     = module.rds.db_host
   db_port     = tostring(module.rds.db_port)
   db_user     = module.rds.db_username
   db_password = module.rds.db_password
   db_name     = module.rds.db_name
   
-  depends_on = [module.rds]
+  # DynamoDB - for STEP II
+  dynamodb_table_name = module.dynamodb.table_name
+  aws_region         = var.aws_region
+  use_dynamodb       = var.use_dynamodb
+  
+  depends_on = [module.rds, module.dynamodb]
 }
 
 # Auto Scaling module - ADD THIS ENTIRE BLOCK

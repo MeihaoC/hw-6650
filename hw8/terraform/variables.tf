@@ -61,3 +61,10 @@ variable "scale_out_cooldown" {
   default     = 300
   description = "Cooldown period (seconds) before scaling out"
 }
+
+# Database selection (default: MySQL for Step 1)
+variable "use_dynamodb" {
+  type        = bool
+  default     = false
+  description = "Set to true to use DynamoDB (Step 2), false to use MySQL (Step 1)"
+}

@@ -1,7 +1,8 @@
 """
 Performance Test Script for Shopping Cart Service
 Tests 150 operations: 50 create, 50 add items, 50 get cart
-Saves results to mysql_test_results.json
+Saves results to dynamodb_test_results.json or mysql_test_results.json
+Automatically detects database type from health check
 """
 
 import json
@@ -11,7 +12,7 @@ from datetime import datetime
 from typing import List, Dict
 import sys
 
-API_URL = "http://shopping-cart-service-alb-1942883329.us-west-2.elb.amazonaws.com"
+API_URL = "http://shopping-cart-service-alb-1967658374.us-west-2.elb.amazonaws.com"
 
 def test_create_cart(customer_id: int) -> Dict:
     """Test POST /shopping-carts"""
@@ -44,7 +45,7 @@ def test_create_cart(customer_id: int) -> Dict:
             "error": str(e)
         }
 
-def test_add_item(cart_id: int, product_id: int, quantity: int) -> Dict:
+def test_add_item(cart_id, product_id: int, quantity: int) -> Dict:
     """Test POST /shopping-carts/{id}/items"""
     start_time = time.time()
     try:
@@ -74,7 +75,7 @@ def test_add_item(cart_id: int, product_id: int, quantity: int) -> Dict:
             "error": str(e)
         }
 
-def test_get_cart(cart_id: int) -> Dict:
+def test_get_cart(cart_id) -> Dict:
     """Test GET /shopping-carts/{id}"""
     start_time = time.time()
     try:
@@ -111,7 +112,7 @@ def main():
     print()
     
     results: List[Dict] = []
-    created_carts: List[int] = []
+    created_carts: List[str] = []  # DynamoDB uses string UUIDs
     
     # Step 1: Create 50 carts
     print("📝 Creating 50 shopping carts...")
@@ -157,8 +158,15 @@ def main():
     print("✅ Retrieved carts")
     print()
     
-    # Save results
-    output_file = "mysql_test_results.json"
+    # Save results - determine output file based on API response
+    # Check if using DynamoDB or MySQL by health check
+    try:
+        health = requests.get(f"{API_URL}/health", timeout=5).json()
+        db_type = health.get("database", "MySQL").lower()
+        output_file = "dynamodb_test_results.json" if "dynamodb" in db_type else "mysql_test_results.json"
+    except:
+        # Default to DynamoDB if can't determine
+        output_file = "dynamodb_test_results.json"
     with open(output_file, 'w') as f:
         json.dump(results, f, indent=2)
     

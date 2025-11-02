@@ -2,22 +2,21 @@ package models
 
 import "time"
 
-// ShoppingCart represents a shopping cart
+// ShoppingCart represents a shopping cart (works for both MySQL and DynamoDB)
 type ShoppingCart struct {
-	CartID     int        `json:"cart_id"`
-	CustomerID int        `json:"customer_id"`
-	CreatedAt  time.Time  `json:"created_at"`
-	UpdatedAt  time.Time  `json:"updated_at"`
-	Items      []CartItem `json:"items,omitempty"`
+	CartID     string     `json:"cart_id" dynamodbav:"cart_id"`
+	CustomerID int        `json:"customer_id" dynamodbav:"customer_id"`
+	CreatedAt  time.Time  `json:"created_at" dynamodbav:"created_at"`
+	UpdatedAt  time.Time  `json:"updated_at" dynamodbav:"updated_at"`
+	Items      []CartItem `json:"items,omitempty" dynamodbav:"items,omitempty"`
 }
 
-// CartItem represents an item in a shopping cart
+// CartItem for DynamoDB (embedded in cart)
 type CartItem struct {
-	CartID    int       `json:"cart_id"`
-	ProductID int       `json:"product_id"`
-	Quantity  int       `json:"quantity"`
-	AddedAt   time.Time `json:"added_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ProductID int       `json:"product_id" dynamodbav:"product_id"`
+	Quantity  int       `json:"quantity" dynamodbav:"quantity"`
+	AddedAt   time.Time `json:"added_at" dynamodbav:"added_at"`
+	UpdatedAt time.Time `json:"updated_at" dynamodbav:"updated_at"`
 }
 
 // CreateCartRequest for POST /shopping-carts
@@ -27,7 +26,7 @@ type CreateCartRequest struct {
 
 // CreateCartResponse for POST /shopping-carts
 type CreateCartResponse struct {
-	ShoppingCartID int `json:"shopping_cart_id"`
+	ShoppingCartID string `json:"shopping_cart_id"` // Changed to string for DynamoDB UUID
 }
 
 // AddItemRequest for POST /shopping-carts/{id}/items

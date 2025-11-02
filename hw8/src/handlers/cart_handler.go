@@ -51,7 +51,7 @@ func CreateCart(c *gin.Context) {
 
 	log.Printf("✅ Created cart %d for customer %d", cartID, req.CustomerID)
 	c.JSON(http.StatusCreated, models.CreateCartResponse{
-		ShoppingCartID: int(cartID),
+		ShoppingCartID: strconv.FormatInt(cartID, 10),
 	})
 }
 
@@ -118,7 +118,6 @@ func GetCart(c *gin.Context) {
 		// If cart has items (productID is not null), add them
 		if productID.Valid && quantity.Valid {
 			item := models.CartItem{
-				CartID:    cartID,
 				ProductID: int(productID.Int64),
 				Quantity:  int(quantity.Int64),
 			}

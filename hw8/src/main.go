@@ -13,47 +13,60 @@ import (
 func main() {
 	log.Println("🚀 Starting Shopping Cart Service...")
 
-	// Initialize database connection
-	if err := database.InitDB(); err != nil {
-		log.Fatalf("❌ Failed to initialize database: %v", err)
-	}
-	defer database.CloseDB()
+	// Check which database to use
+	useDynamoDB := os.Getenv("USE_DYNAMODB") == "true"
 
-	// Initialize database schema (creates tables if they don't exist)
-	if err := database.InitSchema(); err != nil {
-		log.Fatalf("❌ Failed to initialize schema: %v", err)
+	if useDynamoDB {
+		log.Println("📊 Using DynamoDB")
+		if err := database.InitDynamoDB(); err != nil {
+			log.Fatalf("❌ Failed to initialize DynamoDB: %v", err)
+		}
+	} else {
+		log.Println("📊 Using MySQL")
+		if err := database.InitDB(); err != nil {
+			log.Fatalf("❌ Failed to initialize MySQL: %v", err)
+		}
+		defer database.CloseDB()
+
+		if err := database.InitSchema(); err != nil {
+			log.Fatalf("❌ Failed to initialize schema: %v", err)
+		}
 	}
 
 	// Set up Gin router
-	gin.SetMode(gin.ReleaseMode) // Use release mode for production
+	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 
-	// Health check endpoint (required for ALB health checks)
+	// Health check
 	r.GET("/health", func(c *gin.Context) {
+		dbType := "MySQL"
+		if useDynamoDB {
+			dbType = "DynamoDB"
+		}
 		c.JSON(200, gin.H{
-			"status":  "healthy",
-			"service": "shopping-cart-service",
+			"status":   "healthy",
+			"service":  "shopping-cart-service",
+			"database": dbType,
 		})
 	})
 
-	// Shopping cart endpoints (per HW8 OpenAPI spec)
-	r.POST("/shopping-carts", handlers.CreateCart)
-	r.GET("/shopping-carts/:shoppingCartId", handlers.GetCart)
-	r.POST("/shopping-carts/:shoppingCartId/items", handlers.AddItemToCart)
+	// Route to appropriate handlers based on database
+	if useDynamoDB {
+		r.POST("/shopping-carts", handlers.CreateCartDynamo)
+		r.GET("/shopping-carts/:shoppingCartId", handlers.GetCartDynamo)
+		r.POST("/shopping-carts/:shoppingCartId/items", handlers.AddItemToCartDynamo)
+	} else {
+		r.POST("/shopping-carts", handlers.CreateCart)
+		r.GET("/shopping-carts/:shoppingCartId", handlers.GetCart)
+		r.POST("/shopping-carts/:shoppingCartId/items", handlers.AddItemToCart)
+	}
 
-	// Get port from environment or default to 8080
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
 	}
 
 	log.Printf("✅ Server starting on port %s", port)
-	log.Println("📍 Endpoints:")
-	log.Println("   GET  /health")
-	log.Println("   POST /shopping-carts")
-	log.Println("   GET  /shopping-carts/:id")
-	log.Println("   POST /shopping-carts/:id/items")
-
 	if err := r.Run(":" + port); err != nil {
 		log.Fatalf("❌ Failed to start server: %v", err)
 	}

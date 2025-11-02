@@ -99,3 +99,23 @@ variable "db_name" {
   description = "Database name"
   default     = "shoppingcart"
 }
+
+# DynamoDB variables (for STEP II)
+variable "dynamodb_table_name" {
+  type        = string
+  description = "DynamoDB table name for shopping carts"
+  default     = ""
+}
+
+variable "aws_region" {
+  type        = string
+  description = "AWS region for DynamoDB client"
+  default     = "us-west-2"
+}
+
+# Database selection variable
+variable "use_dynamodb" {
+  type        = bool
+  description = "Set to true to use DynamoDB, false to use MySQL (default: false)"
+  default     = false
+}

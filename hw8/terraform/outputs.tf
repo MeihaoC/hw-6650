@@ -58,3 +58,14 @@ output "rds_host" {
   description = "RDS MySQL hostname"
   value       = module.rds.db_host
 }
+
+# DynamoDB outputs (for STEP II)
+output "dynamodb_table_name" {
+  description = "DynamoDB table name for shopping carts"
+  value       = module.dynamodb.table_name
+}
+
+output "dynamodb_table_arn" {
+  description = "DynamoDB table ARN"
+  value       = module.dynamodb.table_arn
+}
