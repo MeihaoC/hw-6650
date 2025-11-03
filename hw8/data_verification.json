@@ -1,0 +1,15 @@
+{
+  "mysql_total": 150,
+  "dynamodb_total": 150,
+  "mysql_by_operation": {
+    "create_cart": 50,
+    "add_items": 50,
+    "get_cart": 50
+  },
+  "dynamodb_by_operation": {
+    "create_cart": 50,
+    "add_items": 50,
+    "get_cart": 50
+  },
+  "valid": true
+}

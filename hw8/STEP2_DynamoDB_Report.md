@@ -75,13 +75,6 @@
 - ❌ 400KB item size limit (not an issue for shopping carts)
 - ✅ But: Simpler code, fewer operations, lower cost
 
-### Global Secondary Index
-
-**customer-index**: GSI on `customer_id`
-- **Purpose**: Query all carts by customer (for purchase history)
-- **Projection**: ALL (full cart data available in index)
-- **Use case**: "Show all my past shopping carts"
-
 ---
 
 ## Implementation Highlights
@@ -345,15 +338,11 @@ Conducted 4 comprehensive consistency tests:
 
 ### Schema Optimizations
 
-1. **Sparse GSI for abandoned carts**
-   - Index on `checkout_timestamp` (only exists when checked out)
-   - Query unchecked carts for remarketing
-
-2. **Composite sort key** if querying items by product
+1. **Composite sort key** if querying items by product
    - PK: `cart_id`, SK: `ITEM#product_id`
    - Enables querying specific products in cart
 
-3. **Separate hot/cold data**
+2. **Separate hot/cold data**
    - Active carts in main table
    - Completed orders in archive table (S3 + Athena)
 

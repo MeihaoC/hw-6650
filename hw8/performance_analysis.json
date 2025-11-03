@@ -1,0 +1,112 @@
+{
+  "mysql": {
+    "database": "MySQL",
+    "total_operations": 150,
+    "successful_operations": 150,
+    "success_rate": 100.0,
+    "avg_response_time": 62.0134,
+    "min_response_time": 52.1,
+    "max_response_time": 99.98,
+    "median_response_time": 60.925,
+    "p50": 60.9,
+    "p95": 71.205,
+    "p99": 96.675,
+    "operations": {
+      "create_cart": {
+        "count": 50,
+        "avg": 61.7808,
+        "min": 52.72,
+        "max": 96.91,
+        "p50": 60.69,
+        "p95": 69.735
+      },
+      "add_items": {
+        "count": 50,
+        "avg": 65.5866,
+        "min": 54.47,
+        "max": 99.98,
+        "p50": 64.7,
+        "p95": 72.52000000000001
+      },
+      "get_cart": {
+        "count": 50,
+        "avg": 58.6728,
+        "min": 52.1,
+        "max": 71.58,
+        "p50": 58.75,
+        "p95": 65.305
+      }
+    }
+  },
+  "dynamodb": {
+    "database": "DynamoDB",
+    "total_operations": 150,
+    "successful_operations": 150,
+    "success_rate": 100.0,
+    "avg_response_time": 64.20933333333333,
+    "min_response_time": 49.66,
+    "max_response_time": 135.47,
+    "median_response_time": 62.665,
+    "p50": 62.66,
+    "p95": 73.85499999999999,
+    "p99": 114.86,
+    "operations": {
+      "create_cart": {
+        "count": 50,
+        "avg": 64.4652,
+        "min": 56.16,
+        "max": 105.21,
+        "p50": 62.55,
+        "p95": 72.815
+      },
+      "add_items": {
+        "count": 50,
+        "avg": 69.019,
+        "min": 50.99,
+        "max": 135.47,
+        "p50": 66.1,
+        "p95": 93.78999999999999
+      },
+      "get_cart": {
+        "count": 50,
+        "avg": 59.1438,
+        "min": 49.66,
+        "max": 67.04,
+        "p50": 58.92,
+        "p95": 65.275
+      }
+    }
+  },
+  "comparison": {
+    "overall": {
+      "mysql_avg": 62.0134,
+      "dynamodb_avg": 64.20933333333333,
+      "difference_ms": 2.195933333333336,
+      "difference_pct": 3.541062630549746,
+      "winner": "MySQL"
+    },
+    "operations": {
+      "create_cart": {
+        "mysql_avg": 61.7808,
+        "dynamodb_avg": 64.4652,
+        "difference_ms": 2.6843999999999966,
+        "difference_pct": 4.345039235490632,
+        "faster": "MySQL"
+      },
+      "add_items": {
+        "mysql_avg": 65.5866,
+        "dynamodb_avg": 69.019,
+        "difference_ms": 3.4324000000000012,
+        "difference_pct": 5.233386088011882,
+        "faster": "MySQL"
+      },
+      "get_cart": {
+        "mysql_avg": 58.6728,
+        "dynamodb_avg": 59.1438,
+        "difference_ms": 0.47099999999999653,
+        "difference_pct": 0.8027569844970694,
+        "faster": "MySQL"
+      }
+    }
+  }
+}
