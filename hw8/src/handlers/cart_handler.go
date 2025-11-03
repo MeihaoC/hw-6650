@@ -68,7 +68,7 @@ func GetCart(c *gin.Context) {
 		return
 	}
 
-	// Get cart with items using single LEFT JOIN (per HW8 requirements)
+	// Get cart with items using single LEFT JOIN
 	query := `
 		SELECT 
 			sc.cart_id, sc.customer_id, sc.created_at, sc.updated_at,
