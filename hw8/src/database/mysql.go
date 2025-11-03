@@ -35,7 +35,7 @@ func InitDB() error {
 		return fmt.Errorf("error opening database: %w", err)
 	}
 
-	// Connection pool settings for performance (per HW8 requirements)
+	// Connection pool settings for performance
 	DB.SetMaxOpenConns(25)                 // Maximum open connections
 	DB.SetMaxIdleConns(5)                  // Maximum idle connections
 	DB.SetConnMaxLifetime(5 * time.Minute) // Connection lifetime
@@ -45,7 +45,7 @@ func InitDB() error {
 	for i := 0; i < maxRetries; i++ {
 		err = DB.Ping()
 		if err == nil {
-			log.Println("✅ Successfully connected to MySQL database")
+			log.Println("Successfully connected to MySQL database")
 			return nil
 		}
 		log.Printf("⚠️  Database connection attempt %d/%d failed: %v", i+1, maxRetries, err)
@@ -58,7 +58,7 @@ func InitDB() error {
 // InitSchema creates the database tables if they don't exist
 // This eliminates the need for separate SQL files
 func InitSchema() error {
-	log.Println("📋 Initializing database schema...")
+	log.Println("Initializing database schema...")
 
 	// Create shopping_carts table
 	_, err := DB.Exec(`
@@ -73,7 +73,7 @@ func InitSchema() error {
 	if err != nil {
 		return fmt.Errorf("failed to create shopping_carts table: %w", err)
 	}
-	log.Println("✅ shopping_carts table ready")
+	log.Println("shopping_carts table ready")
 
 	// Create cart_items table
 	_, err = DB.Exec(`
@@ -91,9 +91,9 @@ func InitSchema() error {
 	if err != nil {
 		return fmt.Errorf("failed to create cart_items table: %w", err)
 	}
-	log.Println("✅ cart_items table ready")
+	log.Println("cart_items table ready")
 
-	log.Println("✅ Database schema initialization complete")
+	log.Println("Database schema initialization complete")
 	return nil
 }
 

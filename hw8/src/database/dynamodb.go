@@ -31,6 +31,6 @@ func InitDynamoDB() error {
 		log.Fatal("DYNAMODB_TABLE_NAME environment variable not set")
 	}
 
-	log.Printf("✅ DynamoDB client initialized (table: %s)", TableName)
+	log.Printf("DynamoDB client initialized (table: %s)", TableName)
 	return nil
 }

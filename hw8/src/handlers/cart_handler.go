@@ -49,7 +49,7 @@ func CreateCart(c *gin.Context) {
 		return
 	}
 
-	log.Printf("✅ Created cart %d for customer %d", cartID, req.CustomerID)
+	log.Printf("Created cart %d for customer %d", cartID, req.CustomerID)
 	c.JSON(http.StatusCreated, models.CreateCartResponse{
 		ShoppingCartID: strconv.FormatInt(cartID, 10),
 	})
@@ -139,7 +139,7 @@ func GetCart(c *gin.Context) {
 		return
 	}
 
-	log.Printf("✅ Retrieved cart %d with %d items (using JOIN)", cartID, len(cart.Items))
+	log.Printf("Retrieved cart %d with %d items (using JOIN)", cartID, len(cart.Items))
 	c.JSON(http.StatusOK, cart)
 }
 
@@ -208,6 +208,6 @@ func AddItemToCart(c *gin.Context) {
 		log.Printf("Warning: Failed to update cart timestamp: %v", err)
 	}
 
-	log.Printf("✅ Added %d x product %d to cart %d", req.Quantity, req.ProductID, cartID)
+	log.Printf("Added %d x product %d to cart %d", req.Quantity, req.ProductID, cartID)
 	c.Status(http.StatusNoContent)
 }

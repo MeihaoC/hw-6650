@@ -67,7 +67,7 @@ func CreateCartDynamo(c *gin.Context) {
 		return
 	}
 
-	log.Printf("✅ Created cart %s for customer %d (DynamoDB)", cartID, req.CustomerID)
+	log.Printf("Created cart %s for customer %d (DynamoDB)", cartID, req.CustomerID)
 	c.JSON(http.StatusCreated, models.CreateCartResponse{
 		ShoppingCartID: cartID,
 	})
@@ -128,7 +128,7 @@ func GetCartDynamo(c *gin.Context) {
 		cart.Items = []models.CartItem{}
 	}
 
-	log.Printf("✅ Retrieved cart %s with %d items (DynamoDB)", cartID, len(cart.Items))
+	log.Printf("Retrieved cart %s with %d items (DynamoDB)", cartID, len(cart.Items))
 	c.JSON(http.StatusOK, cart)
 }
 
@@ -247,6 +247,6 @@ func AddItemToCartDynamo(c *gin.Context) {
 		return
 	}
 
-	log.Printf("✅ Added %d x product %d to cart %s (DynamoDB)", req.Quantity, req.ProductID, cartID)
+	log.Printf("Added %d x product %d to cart %s (DynamoDB)", req.Quantity, req.ProductID, cartID)
 	c.Status(http.StatusNoContent)
 }

@@ -11,25 +11,25 @@ import (
 )
 
 func main() {
-	log.Println("🚀 Starting Shopping Cart Service...")
+	log.Println("Starting Shopping Cart Service...")
 
 	// Check which database to use
 	useDynamoDB := os.Getenv("USE_DYNAMODB") == "true"
 
 	if useDynamoDB {
-		log.Println("📊 Using DynamoDB")
+		log.Println("Using DynamoDB")
 		if err := database.InitDynamoDB(); err != nil {
-			log.Fatalf("❌ Failed to initialize DynamoDB: %v", err)
+			log.Fatalf("Failed to initialize DynamoDB: %v", err)
 		}
 	} else {
-		log.Println("📊 Using MySQL")
+		log.Println("Using MySQL")
 		if err := database.InitDB(); err != nil {
-			log.Fatalf("❌ Failed to initialize MySQL: %v", err)
+			log.Fatalf("Failed to initialize MySQL: %v", err)
 		}
 		defer database.CloseDB()
 
 		if err := database.InitSchema(); err != nil {
-			log.Fatalf("❌ Failed to initialize schema: %v", err)
+			log.Fatalf("Failed to initialize schema: %v", err)
 		}
 	}
 
@@ -66,8 +66,8 @@ func main() {
 		port = "8080"
 	}
 
-	log.Printf("✅ Server starting on port %s", port)
+	log.Printf("Server starting on port %s", port)
 	if err := r.Run(":" + port); err != nil {
-		log.Fatalf("❌ Failed to start server: %v", err)
+		log.Fatalf("Failed to start server: %v", err)
 	}
 }
